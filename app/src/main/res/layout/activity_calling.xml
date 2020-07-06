@@ -6,4 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".CallingActivity">
 
+    <TextView
+        android:id="@+id/txtCallingUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#F60202"
+        android:padding="10dp"
+        android:text="Calling User"
+        android:textSize="30sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.31" />
+
+    <ImageButton
+        android:id="@+id/imgAccept"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="100dp"
+        android:background="#5BFF02"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imgCancel"
+        app:srcCompat="@android:drawable/stat_sys_phone_call"
+        tools:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/imgCancel"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="100dp"
+        android:background="#FF0202"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imgAccept"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
 </androidx.constraintlayout.widget.ConstraintLayout>

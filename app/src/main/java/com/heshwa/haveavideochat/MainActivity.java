@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setTitle("Getting Users");
         progressDialog.setMessage("Please wait until , getting all the users");
         userIds = new ArrayList<>();
+        checkingForRinging();
         getUsersFromServer();
 
 
@@ -54,6 +55,31 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void checkingForRinging()
+    {
+        userRef.child(mAuth.getCurrentUser().getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                if(snapshot.hasChild("Ringing"))
+                {
+                    String callingUser = snapshot.child("Ringing").child("ringing").getValue().toString();
+                    Intent intent = new Intent(MainActivity.this,CallingActivity.class);
+                    intent.putExtra("RingingId",mAuth.getCurrentUser().getUid());
+                    intent.putExtra("CallingId",snapshot.child("Ringing").child("ringing").getValue().toString());
+                    startActivity(intent);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void getUsersFromServer() {

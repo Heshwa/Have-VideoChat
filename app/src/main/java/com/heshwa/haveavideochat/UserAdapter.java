@@ -66,6 +66,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                                                     if(task.isSuccessful())
                                                     {
                                                         Intent intent = new Intent(mContext,CallingActivity.class);
+                                                        intent.putExtra("CallingId",mAuth.getCurrentUser().getUid());
+                                                        intent.putExtra("RingingId",MainActivity.userIds.get(position));
                                                         mContext.startActivity(intent);
                                                     }
                                                 }
