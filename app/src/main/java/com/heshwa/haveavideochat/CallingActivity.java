@@ -25,7 +25,7 @@ public class CallingActivity extends AppCompatActivity {
     private ImageButton imgCancel ,imgAccept;
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
-    private String callingId,ringingId;
+    private String callingId,ringingId,ringingUserName,callingUsername;
 
 
 
@@ -42,48 +42,53 @@ public class CallingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         callingId = intent.getStringExtra("CallingId");
         ringingId = intent.getStringExtra("RingingId");
-
-        if(mAuth.getCurrentUser().getUid().equals(callingId))
-        {
-            imgAccept.setVisibility(View.GONE);
-            userRef.child(ringingId).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists() && snapshot.hasChild("Name"))
-                    txtCallingName.setText(snapshot.child("Name").getValue().toString());
-                    if(!snapshot.hasChild("Ringing"))
-                    {
-                        finish();
-                        Toast.makeText(CallingActivity.this,"Call Cancelled",Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(CallingActivity.this,MainActivity.class);
-                        startActivity(intent);
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+        userRef.child(ringingId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("Name"))
+                    ringingUserName = snapshot.child("Name").getValue().toString();
+                if(!snapshot.hasChild("Ringing") &&
+                        (mAuth.getCurrentUser().getUid().equals(ringingId)|| mAuth.getCurrentUser().getUid().equals(callingId)))
+                {
+                    Toast.makeText(CallingActivity.this,"Call Cancelled",Toast.LENGTH_LONG).show();
+                    finish();
+                    Intent intent = new Intent(CallingActivity.this,MainActivity.class);
+                    startActivity(intent);
 
                 }
-            });
-        }
-        else if(mAuth.getCurrentUser().getUid().equals(ringingId))
-        {
-            imgAccept.setVisibility(View.VISIBLE);
-            userRef.child(callingId).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists() && snapshot.hasChild("Name"))
-                        txtCallingName.setText(snapshot.child("Name").getValue().toString());
+                checkWhetherReceiverOrCaller();
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        userRef.child(callingId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists() && snapshot.hasChild("Name"))
+                    callingUsername = snapshot.child("Name").getValue().toString();
+                if(snapshot.hasChild("Accepted")
+                &&(mAuth.getCurrentUser().getUid().equals(ringingId)|| mAuth.getCurrentUser().getUid().equals(callingId)))
+
+                {
+                    Intent intent = new Intent(CallingActivity.this,VideoCallActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                checkWhetherReceiverOrCaller();
 
-                }
-            });
-        }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
 
 
         imgCancel.setOnClickListener(new View.OnClickListener() {
@@ -95,20 +100,7 @@ public class CallingActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful())
                         {
-                            userRef.child(ringingId).child("Ringing").removeValue()
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful())
-                                    {
-                                        Toast.makeText(CallingActivity.this,"Call Cancelled",Toast.LENGTH_LONG).show();
-                                        Intent intent = new Intent(CallingActivity.this,MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-
-                                }
-                            });
+                            userRef.child(ringingId).child("Ringing").removeValue();
                         }
                     }
                 });
@@ -116,6 +108,27 @@ public class CallingActivity extends AppCompatActivity {
 
             }
         });
+        imgAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                userRef.child(callingId).child("Accepted").setValue("accepted");
+            }
+        });
 
+    }
+    private void checkWhetherReceiverOrCaller()
+    {
+        if(mAuth.getCurrentUser().getUid().equals(callingId))
+        {
+            imgAccept.setVisibility(View.GONE);
+            txtCallingName.setText(ringingUserName);
+
+        }
+        else if(mAuth.getCurrentUser().getUid().equals(ringingId))
+        {
+            imgAccept.setVisibility(View.VISIBLE);
+            txtCallingName.setText(callingUsername);
+
+        }
     }
 }
