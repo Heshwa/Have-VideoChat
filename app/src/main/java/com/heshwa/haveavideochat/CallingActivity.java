@@ -25,7 +25,7 @@ public class CallingActivity extends AppCompatActivity {
     private ImageButton imgCancel ,imgAccept;
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
-    private String callingId,ringingId,ringingUserName,callingUsername;
+    public static String callingId,ringingId,ringingUserName,callingUsername;
 
 
 
@@ -73,6 +73,7 @@ public class CallingActivity extends AppCompatActivity {
                 &&(mAuth.getCurrentUser().getUid().equals(ringingId)|| mAuth.getCurrentUser().getUid().equals(callingId)))
 
                 {
+
                     Intent intent = new Intent(CallingActivity.this,VideoCallActivity.class);
                     startActivity(intent);
                     finish();
